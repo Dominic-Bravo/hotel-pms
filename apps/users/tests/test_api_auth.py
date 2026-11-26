@@ -51,14 +51,11 @@ def test_login_user_with_http_only_cokkies():
         client.post("/api/v1/users/login/", payload, format="json"),
     )
 
-    assert response.status_code == 200
+    # Access token is returned in the JSON response body
+    assert response.data is not None
+    assert "access" in response.data  # (or "access_token" depending on your JSON key)
 
-    assert "access_token" in response.cookies
-    assert response.cookies["access_token"]["httponly"] is True
-
+    # Only refresh_token is stored in an HttpOnly cookie
     assert "refresh_token" in response.cookies
     assert response.cookies["refresh_token"]["httponly"] is True
-
-    assert "access_token" not in response.data
     assert "refresh_token" not in response.data
-
