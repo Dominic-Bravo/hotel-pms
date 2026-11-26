@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,7 +42,13 @@ INSTALLED_APPS = [
 
     "django.contrib.postgres", 
 
+    # security
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "rest_framework.authtoken",
+
     'rest_framework',
+    'drf_spectacular',
     'apps.users',
     'apps.property',
     'apps.pos',
@@ -51,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,6 +70,64 @@ MIDDLEWARE = [
 
 # config/settings.py
 AUTH_USER_MODEL = "users.User"
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),  # Short-lived Access Token
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh Token lifespan
+    "ROTATE_REFRESH_TOKENS": True,  # Issue a new refresh token upon refresh
+    "BLACKLIST_AFTER_ROTATION": True,  # Invalidate used refresh tokens
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    # Cookie Specifics
+    "AUTH_COOKIE": "refresh_token",
+    "AUTH_COOKIE_PATH": "/",  # Scope cookie strictly to refresh endpoint
+    "AUTH_COOKIE_HTTP_ONLY": True,  # Prevents JS/XSS access
+    "AUTH_COOKIE_SECURE": not os.getenv("DEBUG", "True")
+    == "True",  # True in Production (HTTPS)
+    "AUTH_COOKIE_SAMESITE": "Lax",  # Prevents CSRF while preserving navigation
+}
+
+# --- CORS & CSRF Settings ---
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Web Client Dev URL
+    "http://127.0.0.1:3000",
+    "https://yourdomain.com",  # Web Client Production URL
+]
+
+CORS_ALLOW_CREDENTIALS = (
+    True  # Mandatory: allows cookies to be sent with cross-origin requests
+)
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://yourdomain.com",
+]
+
+CSRF_COOKIE_HTTP_ONLY = (
+    False  # Set to False so frontend JavaScript can read the CSRF token from cookie
+)
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = os.getenv("DEBUG", "True") != "True"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,  # Handled via custom response/cookie helper
+    "USER_DETAILS_SERIALIZER": "apps.users.serializers.UserSerializer",
+}
 
 ROOT_URLCONF = 'config.urls'
 
@@ -114,7 +180,8 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+            'UserAttributeSimilarityValidator'
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',

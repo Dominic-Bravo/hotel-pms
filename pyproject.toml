@@ -9,8 +9,12 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "django>=6.1.3",
+    "django-cors-headers>=4.9.0",
     "djangorestframework>=3.18.3",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.30.0",
     "psycopg[binary]>=3.3.9",
+    "python-dotenv>=1.2.4",
 ]
 
 [project.scripts]
@@ -22,6 +26,8 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "django-stubs>=6.1.2",
+    "djangorestframework-stubs>=3.18.2",
     "pytest>=9.2.0",
     "pytest-django>=4.14.0",
     "ruff>=0.17.6",
@@ -31,3 +37,18 @@ dev = [
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 addopts = "--reuse-db"
+
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "basic"
+reportAttributeAccessIssue = "warning"
+reportIncompatibleMethodOverride = "none"
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "DJ"] # DJ enables flake8-django best-practice rules
