@@ -23,5 +23,11 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",
+    "pytest-django>=4.14.0",
     "ruff>=0.17.6",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "--reuse-db"
