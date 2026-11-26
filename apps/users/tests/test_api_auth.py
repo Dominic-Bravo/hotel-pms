@@ -14,12 +14,15 @@ def test_signup_creates_user_with_default_role():
         "email": "staff001@gmail.com",
         "full_name": "Dom Bravo",
         "password": "StrongPassword123!",
+        "password_confirm": "StrongPassword123!",
         "role": "admin",
+        "is_active": True,
+        "is_staff": True,
     }
 
     response = cast(
         Response,
-        client.post("/api/v1/auth/signup/", payload, format="json"),
+        client.post("/api/v1/users/register/", payload, format="json"),
     )
 
     assert response.status_code == 201
@@ -45,7 +48,7 @@ def test_login_user_with_http_only_cokkies():
 
     response = cast(
         Response,
-        client.post("/api/v1/auth/login/", payload, format="json"),
+        client.post("/api/v1/users/login/", payload, format="json"),
     )
 
     assert response.status_code == 200

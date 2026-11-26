@@ -2,6 +2,8 @@ from django.contrib.auth import authenticate, get_user_model
 from django.db import transaction
 from rest_framework import serializers
 
+from apps.users.models import Role
+
 User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -23,14 +25,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "role",
+            "full_name",
             "is_active",
             "is_staff",
             "password",          
             "password_confirm", 
         )
+        read_only_fields = ("id", "is_active", "is_staff")
         extra_kwargs = {
             "full_name": {"required": True},
-            "role": {"required": True},
         }
 
     def validate_email(self, value):
@@ -52,6 +55,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password_confirm")
         password = validated_data.pop("password")
+        validated_data["role"] = Role.FRONT_DESK
 
         # Create user instance
         user = User.objects.create_user(password=password, **validated_data)
@@ -59,7 +63,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class LoginSerializer(serializers.ModelSerializer):
+class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(
         write_only=True,
@@ -94,6 +98,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "email",
+            "full_name",
             "role",
             "is_active",
             "is_staff",
