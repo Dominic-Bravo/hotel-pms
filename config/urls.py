@@ -23,6 +23,7 @@ from drf_spectacular.views import (
 
 api_patterns = [
     path("api/v1/users/", include("apps.users.urls", namespace="users")),
+    path("api/v1/pos/", include("apps.pos.urls", namespace="pos")),
 ]
 
 urlpatterns = [
