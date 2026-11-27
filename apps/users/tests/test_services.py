@@ -15,3 +15,4 @@ def test_next_invoice_number_increments():
 
     assert next_invoice_number("ROOM") == "INV-0001"
     assert next_invoice_number("ROOM") == "INV-0002"
+
