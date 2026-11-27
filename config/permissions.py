@@ -11,7 +11,8 @@ from rest_framework import permissions
 
 class HasRole(permissions.BasePermission):
     """
-    Base permission class that checks if the authenticated user has one of the allowed roles.
+    Base permission class that checks if the 
+    authenticated user has one of the allowed roles.
     """
     allowed_roles = []
 

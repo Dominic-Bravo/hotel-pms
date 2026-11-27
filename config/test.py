@@ -8,10 +8,9 @@ from rest_framework.test import APIClient
 from rest_framework.views import APIView
 
 from apps.users.models import User
-from config.permissions import IsAdminOrManager  # adjust import path if needed
+from config.permissions import IsAdminOrManager
 
 
-# 1. Define a mock view inside the test file
 class MockProtectedView(APIView):
     permission_classes = [IsAdminOrManager]
 
@@ -19,13 +18,12 @@ class MockProtectedView(APIView):
         return Response({"status": "access granted"})
 
 
-# 2. Expose urlpatterns in this module so @pytest.mark.urls(__name__) can load it
+
 urlpatterns = [
     path("mock-protected/", MockProtectedView.as_view(), name="mock-protected"),
 ]
 
 
-# 3. Run APIClient tests against the mock endpoint
 @pytest.mark.django_db
 @pytest.mark.urls(__name__)
 @pytest.mark.parametrize(

@@ -37,7 +37,7 @@ class Outlet(TimeStampedModel):
 
 class Terminal(TimeStampedModel):
     outlet = models.ForeignKey(Outlet, on_delete=models.PROTECT, related_name="terminals")
-    code = models.CharField(max_length=20, unique=True)  # e.g. "T01"
+    code = models.CharField(max_length=20, unique=True)  
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     last_sync_at = models.DateTimeField(null=True, blank=True)
